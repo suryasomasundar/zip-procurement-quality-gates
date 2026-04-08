@@ -1,0 +1,17 @@
+{
+  "name": "@zip-takehome/api",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "start": "tsx src/server.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test:integration": "vitest run src/app.integration.test.ts",
+    "test:coverage": "vitest run --config vitest.config.ts src/app.integration.test.ts --coverage"
+  },
+  "dependencies": {
+    "@zip-takehome/domain": "*",
+    "express": "^4.21.2"
+  }
+}

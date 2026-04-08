@@ -1,0 +1,42 @@
+name: Flaky test report
+description: Track unstable tests or intermittent CI behavior
+title: "[Flaky Test]: "
+labels:
+  - test
+  - flaky
+body:
+  - type: input
+    id: test_name
+    attributes:
+      label: Test name
+      placeholder: apps/web/tests/e2e/procurement-flow.spec.ts
+    validations:
+      required: true
+  - type: textarea
+    id: symptoms
+    attributes:
+      label: Failure symptoms
+      placeholder: What failed, how often, and in which workflow?
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Supporting evidence
+      placeholder: Link CI runs, traces, screenshots, or logs
+  - type: dropdown
+    id: scope
+    attributes:
+      label: Layer
+      options:
+        - Unit
+        - Integration
+        - End-to-end
+        - Workflow / Infrastructure
+    validations:
+      required: true
+  - type: textarea
+    id: mitigation
+    attributes:
+      label: Immediate mitigation
+      placeholder: Retry policy, quarantine, selector fix, data fix, etc.

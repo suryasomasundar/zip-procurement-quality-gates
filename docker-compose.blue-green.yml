@@ -1,0 +1,38 @@
+services:
+  edge:
+    build:
+      context: .
+      dockerfile: deploy/edge/Dockerfile
+    env_file:
+      - .env.blue-green
+    ports:
+      - "8080:8080"
+    depends_on:
+      - api-blue
+      - api-green
+      - web-blue
+      - web-green
+
+  api-blue:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    environment:
+      PORT: 3001
+
+  api-green:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    environment:
+      PORT: 3001
+
+  web-blue:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+
+  web-green:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile

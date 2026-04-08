@@ -1,0 +1,28 @@
+name: Security report
+description: Track non-sensitive security findings that are safe to discuss in the repo
+title: "[Security]: "
+labels:
+  - security
+body:
+  - type: markdown
+    attributes:
+      value: Do not use this form for active secret leaks or sensitive vulnerabilities. Use the private disclosure link instead.
+  - type: input
+    id: summary
+    attributes:
+      label: Summary
+    validations:
+      required: true
+  - type: textarea
+    id: affected_area
+    attributes:
+      label: Affected area
+      placeholder: Workflow, dependency, API behavior, logging, etc.
+    validations:
+      required: true
+  - type: textarea
+    id: recommendation
+    attributes:
+      label: Recommended remediation
+    validations:
+      required: true

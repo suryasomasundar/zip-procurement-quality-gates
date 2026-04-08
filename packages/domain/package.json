@@ -1,0 +1,13 @@
+{
+  "name": "@zip-takehome/domain",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test:unit": "vitest run --config vitest.config.ts src/index.test.ts",
+    "test:coverage": "vitest run --config vitest.config.ts src/index.test.ts --coverage"
+  }
+}
