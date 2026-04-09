@@ -1,5 +1,6 @@
 name: Deploy Smoke
 
+# This workflow is intended for manually validating a deployed environment URL.
 on:
   workflow_dispatch:
     inputs:
