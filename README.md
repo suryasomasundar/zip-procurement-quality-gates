@@ -71,6 +71,8 @@ This repo includes the CI workflow, a PR template, and a `CODEOWNERS` file. Afte
 - block direct pushes
 - allow squash and rebase merges only
 
+This sample repository uses `master` as the default branch to match the wording of the take-home assignment.
+
 Detailed rollout notes are in [`docs/process.md`](/Users/somu-cookunity/Documents/zip/docs/process.md).
 
 ## Local blue/green rollout
