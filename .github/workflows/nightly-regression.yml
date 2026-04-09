@@ -1,5 +1,6 @@
 name: Nightly Regression
 
+# Manual trigger is included so the workflow can be run on demand in addition to the nightly schedule.
 on:
   workflow_dispatch:
   schedule:
