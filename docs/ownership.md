@@ -19,6 +19,18 @@ This document defines ownership at the component and process level so failures c
 3. QA owner determines whether the issue is product, test, or infrastructure related.
 4. Engineering manager decides whether the issue blocks merges or can be mitigated temporarily.
 
+## Review routing guidance
+
+Use these defaults when assigning reviewers:
+
+- Frontend (`apps/web`): frontend or product-facing reviewer
+- API (`apps/api`): backend or API reviewer
+- Domain rules (`packages/domain`): QA or domain logic owner
+- CI, release, Docker, and deployment files: platform or infrastructure reviewer
+- Security-sensitive changes: security-aware reviewer
+
+Detailed working agreements for review readiness, SLA, communication, and merge expectations are documented in [`review-guidelines.md`](./review-guidelines.md).
+
 ## Merge blocking guidance
 
 Treat the following as merge-blocking by default:

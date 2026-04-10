@@ -1,174 +1,277 @@
 # Delivery Process
 
-## Goal
+## Purpose
 
-This take-home shows how a small procurement workflow can be shipped with clear quality gates around it. The goal is to pair a simple product flow with practical testing, CI, and pull request governance.
+This repository is intentionally small at the product layer and more deliberate at the delivery layer. The goal is to show how a procurement workflow can be built, reviewed, tested, deployed, and released with clear quality controls.
 
-## SDLC framing
+The process is designed to do four things well:
+
+- keep `master` releasable
+- give engineers fast feedback before merge
+- make ownership and review expectations explicit
+- create a repeatable path from pull request to validated release
+
+## Operating principles
+
+- every change should be reviewable, testable, and reversible
+- the pull request is the main quality gate, not the first place issues are discovered
+- `master` should reflect code that is safe to deploy
+- automation should reduce manual toil, not hide risk
+- release promotion should happen only after live validation succeeds
+
+## Delivery lifecycle
+
+At a high level, the workflow is:
 
 1. Define the procurement workflow and approval rules.
-2. Implement business logic in a shared domain package.
-3. Expose the logic through an API.
-4. Build a UI that captures procurement intake data.
-5. Validate behavior with unit, integration, and E2E tests.
-6. Enforce the same checks on pull requests and on `master`.
-7. Protect merges with reviews and branch rules.
+2. Implement the behavior in the shared domain, API, and UI layers.
+3. Validate the behavior with unit, integration, and end-to-end tests.
+4. Open a pull request and run governance, CI, and security checks.
+5. Collect review feedback and approvals.
+6. Merge to `master` using the protected merge policy.
+7. Deploy from `master`.
+8. Validate the live environment.
+9. Mark the release only after live validation succeeds.
 
-## Required GitHub settings
+For the day-to-day working agreement around PR readiness, review communication, SLA, merge expectations, and conflict handling, see [`review-guidelines.md`](./review-guidelines.md).
+
+## Required GitHub protections
 
 These settings cannot be fully enforced from the repository alone and should be configured in GitHub after the repo is pushed.
 
-### Branch protection
+### Branch protection for `master`
 
-Apply a branch protection rule to `master` with:
+- require a pull request before merging
+- require at least 1 approval
+- dismiss stale approvals when new commits are pushed
+- require conversation resolution before merging
+- require status checks to pass before merging
+- block force pushes
+- restrict branch deletion
+- require linear history
 
-- Require a pull request before merging
-- Require at least 1 approval
-- Dismiss stale approvals when new commits are pushed
-- Require status checks to pass before merging
-- Select the `quality` workflow job as the required status check
-- Restrict direct pushes to `master`
+The primary required summary gate should be:
+
+- `CI / Quality Gate (pull_request)`
+
+Additional required checks may include:
+
+- `PR Governance`
+- `CodeQL / analyze (javascript-typescript) (pull_request)`
+- `Security Audit / dependency-audit (pull_request)`
+- `Gitleaks / scan (pull_request)`
 
 ### Merge policy
 
 Repository merge settings should be:
 
-- Allow squash merge
-- Allow rebase merge
-- Disable merge commits
+- allow squash merge
+- allow rebase merge
+- disable merge commits
 
-This satisfies the assignment requirement to require squash and rebase style merges while preventing merge commits.
+This satisfies the assignment requirement to allow squash and rebase style merges while preventing merge commits.
 
-## CI behavior
+## CI, governance, and security behavior
 
-The workflow in [`ci.yml`](../.github/workflows/ci.yml) runs on:
+The repository uses GitHub Actions as the CI platform.
+
+### Core CI workflow
+
+[`ci.yml`](../.github/workflows/ci.yml) runs on:
 
 - every pull request
 - every push to `master`
 
-Checks performed:
+It is intentionally organized into a small set of clear stages:
 
-- ESLint
-- TypeScript typecheck
-- unit tests for domain logic
-- API integration tests
-- UI integration tests
-- coverage reporting
-- Playwright smoke E2E tests
-- dependency audit
-- CodeQL static analysis
+- `Quality Core`
+  - lint
+  - typecheck
+  - unit tests
+  - API integration tests
+  - web integration tests
+  - coverage
+- `E2E Smoke Tests`
+  - Playwright browser smoke validation
+- `Quality Gate`
+  - final summary gate that fails if any required quality stage fails
+
+### Additional workflows
+
+Separate workflows also run for governance and security:
+
+- [`pr-governance.yml`](../.github/workflows/pr-governance.yml)
+- [`codeql.yml`](../.github/workflows/codeql.yml)
+- [`security-audit.yml`](../.github/workflows/security-audit.yml)
+- [`gitleaks.yml`](../.github/workflows/gitleaks.yml)
+- [`nightly-regression.yml`](../.github/workflows/nightly-regression.yml)
+- [`deploy-smoke.yml`](../.github/workflows/deploy-smoke.yml)
+- [`release.yml`](../.github/workflows/release.yml)
+
+This keeps the core CI path readable while still enforcing governance, security, deployment, and release expectations.
 
 ## Failure modes
 
-Ways this process can fail include:
+This process can fail in several ways.
 
-- Dependency install failure because of lockfile drift or registry issues
-- Typecheck failures caused by schema or interface drift
-- Lint failures caused by coding standard regressions
-- Unit test failures caused by approval-routing logic regressions
-- API integration failures caused by contract or request-shape changes
-- UI integration failures caused by broken form wiring
-- E2E failures caused by user-flow regressions or flaky selectors
-- Dependency audit failures caused by vulnerable packages
-- CodeQL findings caused by unsafe patterns or insecure code paths
-- GitHub branch protection drift if required checks are renamed
-- Missing or stale CODEOWNERS ownership
-- Review bottlenecks if approvers are unavailable
+### Pull request and governance failures
+
+- branch name does not match the required format
+- PR title does not include a valid ticket reference
+- PR body is missing required sections
+- required reviewer approval is not obtained
+- unresolved review conversations block merge
+- CODEOWNERS or reviewer routing is outdated
+
+### CI and test failures
+
+- dependency installation fails because of lockfile drift
+- lint or typecheck fails because of code changes or interface drift
+- unit tests fail because domain rules changed unexpectedly
+- API integration tests fail because request or response behavior changed
+- UI integration tests fail because the form flow or rendering broke
+- E2E smoke tests fail because the main user path regressed
+- coverage fails because new code paths are not exercised
+
+### Security failures
+
+- dependency audit detects vulnerable packages
+- CodeQL detects unsafe implementation patterns
+- Gitleaks detects a committed secret or credential
+- workflow or deployment changes create a governance gap
+
+### Deployment and release failures
+
+- Render build fails
+- the service starts but the app is not served correctly
+- `/api/health` fails or returns unexpected metadata
+- deploy-smoke or release-smoke tests fail against the live service
+- a release tag already exists or uses the wrong version format
+
+### Process failures
+
+- required checks are renamed but branch protection is not updated
+- review requests are delayed beyond SLA
+- broken `master` is not triaged quickly
+- flaky tests erode trust in the quality gates
+- ownership is unclear during an incident
 
 ## Notifications and visibility
 
-GitHub will notify:
+### Current notification model
 
-- Pull request authors when checks fail
-- Reviewers when approval is requested
-- Subscribers/watchers based on their GitHub notification preferences
+The current implementation relies primarily on GitHub-native visibility:
 
-The workflow also uploads Playwright artifacts on failure, which helps engineers and QA inspect traces and debug quickly in GitHub Actions.
+- PR authors are notified in GitHub when checks fail
+- requested reviewers are notified in GitHub when review is needed
+- branch protection communicates merge blockers directly in the PR
+- workflow failures are visible in GitHub Actions
+- CodeQL findings appear in GitHub Security and code scanning
 
-Scheduled security workflows also create recurring visibility:
+### Debugging artifacts
 
-- weekly CodeQL scans for static analysis drift
-- weekly dependency audits for package vulnerability drift
-- weekly Gitleaks scans for secret leakage drift
+The workflows also publish useful diagnostics:
+
+- Playwright traces and reports for failed E2E runs
+- coverage artifacts from CI
+- workflow logs for governance, release, and security failures
+
+### Recommended next-step notifications
+
+As the process matures, I would add:
+
+- Slack alerts for broken `master`
+- Slack alerts for failed release validation
+- Slack escalation for high-severity security findings
+- a weekly quality summary for engineering leadership
 
 ## Stakeholders
 
-As this process evolves, the key stakeholders are:
+This process starts with engineering, but it becomes broader as the workflow matures.
 
-- Product engineers who own feature delivery
-- QA or quality engineering who own coverage strategy
-- Engineering managers who own merge policy and team workflow
-- Platform or DevOps partners who may help with CI scale and secrets
-- Security, legal, and finance partners when approval-routing policy changes
+### Core stakeholders
+
+- product engineers who build and review features
+- QA or quality engineering who own test strategy and pipeline quality
+- engineering managers who own team workflow and review expectations
+- platform or DevOps partners who own CI/CD plumbing, secrets, and deployment controls
+
+### Extended stakeholders
+
+- security partners when static analysis, secrets, or package risk changes
+- legal and finance stakeholders when procurement approval logic evolves
+- product stakeholders when release timing or workflow behavior impacts users
+- release or incident owners when production validation fails
 
 Operational ownership, reporting, and communication templates are documented in:
 
+- [`review-guidelines.md`](./review-guidelines.md)
 - [`ownership.md`](./ownership.md)
 - [`triage-and-comms.md`](./triage-and-comms.md)
 - [`weekly-quality-report.md`](./weekly-quality-report.md)
 - [`bug-scoring.md`](./bug-scoring.md)
 
-## Phase 3 rollout maturity
-
-Phase 3 extends the project beyond CI into release confidence and operational safety:
-
-- nightly regression to catch drift outside the PR path
-- deploy-smoke workflow that can validate a hosted preview or release URL
-- release workflow that validates production and creates a Git tag plus GitHub Release
-- secret scanning for accidental credential exposure
-- issue templates for bug intake and flaky-test triage
-- local blue/green deployment to model traffic switching and rollback
-
 ## Deployment validation
 
-The deploy-smoke workflow can be triggered manually with a target URL. It reuses the Playwright smoke suite against a deployed environment instead of the local dev server. This is intended for:
+The deploy-smoke workflow can be triggered manually with a target URL. It reuses the Playwright smoke suite against a deployed environment instead of the local dev server.
 
-- preview environments
+This is intended for:
+
+- preview validation
 - staging validation
 - post-release smoke checks
+- manual production confidence checks when needed
 
 ## Release process
 
-This repo treats release as staged promotion rather than one long script.
+This repository treats release as staged promotion rather than one long script.
 
 ```mermaid
 flowchart LR
-  A["Stage 1: PR Validation"] --> B["Stage 2: Approval Gate"]
-  B --> C["Stage 3: Deploy from master"]
-  C --> D["Stage 4: Live Validation"]
-  D --> E["Stage 5: Release Tag + Notes"]
-  D --> F["Rollback or Fix Forward"]
+  A["Pull Request"] --> B["Stage 1: PR Validation"]
+  B --> C["Stage 2: Approval Gate"]
+  C --> D["Stage 3: Merge to master"]
+  D --> E["Stage 4: Render Deploy"]
+  E --> F["Stage 5: Post-Deploy Validation"]
+  F --> G["Stage 6: Tag + GitHub Release"]
+  F --> H["Rollback or Fix Forward"]
 ```
 
-Stage summary:
+### Stage summary
 
 1. `PR Validation`
-   Lint, typecheck, unit tests, integration tests, E2E smoke, coverage, and security checks run on the pull request.
+   Governance, CI, and security checks run on the pull request.
 2. `Approval Gate`
-   Branch protection requires a reviewer approval and passing checks before merge.
-3. `Deploy from master`
-   Render automatically deploys the merged commit from `master`.
-4. `Live Validation`
-   The deployed root URL, `/api/health`, and deployed smoke tests are validated against the live service.
-5. `Release Tag + Notes`
-   [`.github/workflows/release.yml`](../.github/workflows/release.yml) creates a semantic version tag and a GitHub Release only after live validation passes.
+   Required approvals and conversation resolution protect the merge.
+3. `Merge to master`
+   Approved changes merge into the protected branch.
+4. `Render Deploy`
+   Render deploys the merged commit from `master`.
+5. `Post-Deploy Validation`
+   The root URL, `/api/health`, and deployed smoke tests validate the live service.
+6. `Tag + GitHub Release`
+   [`.github/workflows/release.yml`](../.github/workflows/release.yml) creates a semantic version tag and GitHub Release only after live validation succeeds.
 
 The `/api/health` endpoint includes release metadata so the deployed service can report its current version during validation.
 
-## Blue/green mechanism
+## Local blue/green simulation
 
-The blue/green assets in [`docker-compose.blue-green.yml`](../docker-compose.blue-green.yml) model a local release pattern where:
+The blue/green assets in [`docker-compose.blue-green.yml`](../docker-compose.blue-green.yml) model a local rollout pattern where:
 
 1. blue and green stacks exist at the same time
 2. an edge proxy points traffic to the active stack
 3. the inactive stack can be updated and validated
 4. traffic flips only after validation succeeds
-5. rollback is a fast switch back to the previous color
+5. rollback is a quick switch back to the previous color
+
+This is a local release-engineering simulation, not the primary hosted deployment path for this submission.
 
 ## Recommended future evolution
 
-- Add contract tests for API payload changes
-- Add nightly broader E2E regression coverage
-- Add deployment preview environments for richer PR validation
-- Add Slack alerts for broken `master` branch quality gates
-- Add secret scanning and PII detection for stronger security guardrails
+- add contract tests for API payload changes
+- add broader nightly regression coverage
+- add preview environments for PR validation
+- add stronger reviewer auto-routing by file ownership
+- add flaky-test quarantine and tracking
+- add Slack alerts for broken `master`
+- add stricter release approval for infrastructure or security-sensitive changes

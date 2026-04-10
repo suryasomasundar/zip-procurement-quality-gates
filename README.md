@@ -1,5 +1,9 @@
 # Zip Procurement Intake QA Take-Home
 
+Live application:
+
+- [zip-procurement-quality-gates.onrender.com](https://zip-procurement-quality-gates.onrender.com)
+
 This repository is a small procurement intake application wrapped in a deliberate QA and release process. A user submits a purchase request, the system evaluates the request, and the UI shows which teams need to approve it based on spend, contract review, and data handling. The app itself is intentionally small; the main focus of the exercise is the delivery pipeline, governance model, and release confidence.
 
 ## What this repo demonstrates
@@ -80,14 +84,15 @@ The primary CI workflow is [`ci.yml`](.github/workflows/ci.yml). It runs on:
 - every pull request
 - every push to `master`
 
-The CI pipeline is split into explicit jobs so the PR view shows clear quality stages:
+The CI pipeline is intentionally organized into a small set of clear quality stages:
 
-- `Lint`
-- `Typecheck`
-- `Unit Tests`
-- `API Integration Tests`
-- `Web Integration Tests`
-- `Coverage`
+- `Quality Core`
+  - lint
+  - typecheck
+  - unit tests
+  - API integration tests
+  - web integration tests
+  - coverage
 - `E2E Smoke Tests`
 - `Quality Gate`
 
@@ -121,6 +126,7 @@ PR process artifacts:
 - [Issue templates](.github/ISSUE_TEMPLATE)
 
 Detailed rollout notes are in [docs/process.md](docs/process.md).
+Detailed review expectations are in [docs/review-guidelines.md](docs/review-guidelines.md).
 
 ## PR quality rules
 
@@ -167,7 +173,7 @@ flowchart LR
 Stage details:
 
 1. `PR Validation`
-   Lint, typecheck, unit tests, API integration tests, web integration tests, coverage, E2E smoke, and PR governance checks run on the PR.
+   Governance, CI, and security checks run on the PR.
 2. `Approval Gate`
    Branch protection requires approval and passing required checks.
 3. `Merge to master`
@@ -214,13 +220,14 @@ These assets model:
 
 Supporting process docs are available in:
 
+- [Take-home summary](docs/take-home-summary.md)
 - [Architecture](docs/architecture.md)
 - [Process](docs/process.md)
+- [Review guidelines](docs/review-guidelines.md)
 - [Ownership](docs/ownership.md)
 - [Triage and communications](docs/triage-and-comms.md)
 - [Weekly quality report](docs/weekly-quality-report.md)
 - [Bug scoring](docs/bug-scoring.md)
-- [Video outline](docs/video-outline.md)
 
 ## Should there be Codex or skills docs?
 
