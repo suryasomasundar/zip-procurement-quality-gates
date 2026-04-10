@@ -86,6 +86,25 @@ To deploy:
 
 The blueprint uses `autoDeployTrigger: checksPass`, so Render deploys only after GitHub checks pass on the linked branch.
 
+## Deployment and release pipeline
+
+The deployment pipeline for this repo is:
+
+1. Open a pull request against `master`.
+2. GitHub Actions runs linting, typechecking, tests, coverage, and security checks.
+3. After approval and passing checks, merge to `master`.
+4. Render auto-deploys the merged commit from `master`.
+5. Validate the live deployment with:
+   - the root URL
+   - `/api/health`
+6. Run the manual release workflow in [`.github/workflows/release.yml`](/Users/somu-cookunity/Documents/zip-code/.github/workflows/release.yml) to:
+   - re-validate the live deployment
+   - run deployed Playwright smoke tests
+   - create a Git tag such as `v1.0.0`
+   - publish a GitHub Release
+
+This keeps deployment automatic but release marking intentional.
+
 ## Local blue/green rollout
 
 The repository includes a Docker-based blue/green demo for local release validation. Setup notes are in [`docs/blue-green.md`](/Users/somu-cookunity/Documents/zip/docs/blue-green.md).

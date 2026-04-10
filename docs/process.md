@@ -114,6 +114,7 @@ Phase 3 extends the project beyond CI into release confidence and operational sa
 
 - nightly regression to catch drift outside the PR path
 - deploy-smoke workflow that can validate a hosted preview or release URL
+- release workflow that validates production and creates a Git tag plus GitHub Release
 - secret scanning for accidental credential exposure
 - issue templates for bug intake and flaky-test triage
 - local blue/green deployment to model traffic switching and rollback
@@ -125,6 +126,16 @@ The deploy-smoke workflow can be triggered manually with a target URL. It reuses
 - preview environments
 - staging validation
 - post-release smoke checks
+
+## Release process
+
+A simple release process for this repo is:
+
+1. merge an approved PR into `master`
+2. allow Render to auto-deploy from `master`
+3. validate the live root URL and `/api/health`
+4. run [`.github/workflows/release.yml`](/Users/somu-cookunity/Documents/zip-code/.github/workflows/release.yml) from `master`
+5. the release workflow validates the live deployment again, runs deployed smoke tests, creates a version tag, and publishes a GitHub Release
 
 ## Blue/green mechanism
 

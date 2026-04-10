@@ -1,0 +1,85 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Release version tag (for example v1.0.0)
+        required: true
+      base_url:
+        description: Fully qualified production URL to validate before release
+        required: true
+        default: https://zip-procurement-quality-gates.onrender.com
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Ensure workflow is running from master
+        if: github.ref_name != 'master'
+        run: |
+          echo "Releases must be created from the master branch."
+          exit 1
+
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Verify version format
+        run: |
+          if [[ ! "${{ inputs.version }}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Version must follow v<major>.<minor>.<patch>."
+            exit 1
+          fi
+
+      - name: Check if tag already exists
+        run: |
+          if git rev-parse "${{ inputs.version }}" >/dev/null 2>&1; then
+            echo "Tag ${{ inputs.version }} already exists."
+            exit 1
+          fi
+
+      - name: Validate deployed root URL
+        run: curl --fail --silent --show-error "${{ inputs.base_url }}" >/tmp/release-root.html
+
+      - name: Validate deployed health endpoint
+        run: curl --fail --silent --show-error "${{ inputs.base_url }}/api/health"
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Run deployed smoke tests
+        env:
+          PLAYWRIGHT_BASE_URL: ${{ inputs.base_url }}
+          PLAYWRIGHT_SKIP_WEBSERVER: "1"
+        run: npm run test:e2e
+
+      - name: Create and push tag
+        run: |
+          git tag "${{ inputs.version }}"
+          git push origin "${{ inputs.version }}"
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ inputs.version }}
+          generate_release_notes: true
+          body: |
+            Production release created after live deployment validation.
+
+            Validated URL: ${{ inputs.base_url }}
+            Source branch: master
