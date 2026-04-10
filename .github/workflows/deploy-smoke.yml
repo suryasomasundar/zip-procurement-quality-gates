@@ -11,7 +11,7 @@ on:
       base_url:
         description: Fully qualified URL for the deployed application
         required: true
-        default: https://example-preview.zip-takehome.dev
+        default: https://zip-procurement-quality-gates.onrender.com
 
 jobs:
   smoke:
