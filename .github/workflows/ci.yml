@@ -7,7 +7,8 @@ on:
       - master
 
 jobs:
-  quality:
+  quality-core:
+    name: Quality Core
     runs-on: ubuntu-latest
 
     steps:
@@ -32,8 +33,11 @@ jobs:
       - name: Run unit tests
         run: npm run test:unit
 
-      - name: Run integration tests
-        run: npm run test:integration
+      - name: Run API integration tests
+        run: npm --workspace @zip-takehome/api run test:integration
+
+      - name: Run web integration tests
+        run: npm --workspace @zip-takehome/web run test:integration
 
       - name: Collect coverage
         run: npm run coverage
@@ -47,6 +51,23 @@ jobs:
             apps/api/coverage
             apps/web/coverage
             packages/domain/coverage
+
+  e2e-smoke-tests:
+    name: E2E Smoke Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
 
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
@@ -62,3 +83,26 @@ jobs:
           path: |
             playwright-report
             test-results
+
+  quality:
+    name: Quality Gate
+    runs-on: ubuntu-latest
+    if: always()
+    needs:
+      - quality-core
+      - e2e-smoke-tests
+
+    steps:
+      - name: Confirm all quality jobs passed
+        env:
+          QUALITY_CORE_RESULT: ${{ needs.quality-core.result }}
+          E2E_SMOKE_RESULT: ${{ needs.e2e-smoke-tests.result }}
+        run: |
+          if [[ "$QUALITY_CORE_RESULT" != "success" || "$E2E_SMOKE_RESULT" != "success" ]]; then
+            echo "One or more CI quality stages failed."
+            echo "quality-core=$QUALITY_CORE_RESULT"
+            echo "e2e-smoke-tests=$E2E_SMOKE_RESULT"
+            exit 1
+          fi
+
+          echo "All CI quality stages passed."

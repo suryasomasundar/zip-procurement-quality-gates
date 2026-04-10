@@ -1,22 +1,53 @@
 # Zip Procurement Intake QA Take-Home
 
-This repository is a small procurement intake application with a QA-focused delivery setup around it. A user submits a purchase request, the system evaluates the request, and the UI shows which teams need to approve it based on spend, contract review, and data handling.
+This repository is a small procurement intake application wrapped in a deliberate QA and release process. A user submits a purchase request, the system evaluates the request, and the UI shows which teams need to approve it based on spend, contract review, and data handling. The app itself is intentionally small; the main focus of the exercise is the delivery pipeline, governance model, and release confidence.
 
-## Scope
+## What this repo demonstrates
 
-- React + Vite frontend for procurement intake
-- Express API for evaluation logic
-- Shared TypeScript domain rules for validation and approval routing
-- Unit, integration, and end-to-end coverage
-- GitHub Actions CI for pull requests and `master`
-- Plain text and CSS UI with no icon library or generated visual assets
+- A small full-stack TypeScript application aligned to Zip's procurement workflow domain
+- A layered automated testing strategy across unit, integration, and end-to-end coverage
+- Pull request quality gates with branch protection, approvals, and status checks
+- Security and quality checks in GitHub Actions
+- A real deployment path using Render
+- A lightweight release process with post-deploy validation, tagging, and GitHub Releases
+- Bonus release-engineering artifacts for local Docker and blue/green rollout simulation
+
+## Application overview
+
+The product flow models a lightweight procurement intake request:
+
+- an employee submits a purchase request
+- the API evaluates the request
+- the UI shows the approval path and risk level
+- routing logic reflects spend, contract review, and customer-data handling
+
+Example approval logic:
+
+- high spend triggers Finance
+- contract review triggers Legal
+- customer data triggers Security
+- low-risk requests stay with Manager approval only
+
+## Architecture
+
+See the full architecture notes in [docs/architecture.md](docs/architecture.md).
+
+High-level components:
+
+- `apps/web`: React + Vite frontend
+- `apps/api`: Express API
+- `packages/domain`: shared procurement business rules
+- `.github/workflows`: CI, security, deployment-smoke, nightly, release, and PR-governance workflows
+- `docs`: process, architecture, ownership, blue/green, reporting, and release documentation
 
 ## Testing strategy
 
-- Unit tests validate procurement business rules in [`packages/domain/src/index.ts`](/Users/somu-cookunity/Documents/zip/packages/domain/src/index.ts)
-- API integration tests validate request handling in [`apps/api/src/app.ts`](/Users/somu-cookunity/Documents/zip/apps/api/src/app.ts)
-- UI integration tests validate form behavior in [`apps/web/src/App.tsx`](/Users/somu-cookunity/Documents/zip/apps/web/src/App.tsx)
-- Playwright smoke tests validate critical browser journeys in [`apps/web/tests/e2e/procurement-flow.spec.ts`](/Users/somu-cookunity/Documents/zip/apps/web/tests/e2e/procurement-flow.spec.ts)
+This repo uses a small but explicit test pyramid:
+
+- Unit tests validate procurement business rules in [`packages/domain/src/index.ts`](packages/domain/src/index.ts)
+- API integration tests validate routing and health behavior in [`apps/api/src/app.ts`](apps/api/src/app.ts)
+- UI integration tests validate form behavior in [`apps/web/src/App.tsx`](apps/web/src/App.tsx)
+- Playwright smoke tests validate critical browser journeys in [`apps/web/tests/e2e/procurement-flow.spec.ts`](apps/web/tests/e2e/procurement-flow.spec.ts)
 
 ## Local setup
 
@@ -25,9 +56,10 @@ npm install
 npm run dev
 ```
 
-Frontend: `http://localhost:5173`
+Local URLs:
 
-API: `http://localhost:3001`
+- Frontend: `http://localhost:5173`
+- API: `http://localhost:3001`
 
 ## Local quality checks
 
@@ -41,52 +73,83 @@ npm run test:e2e
 npm run security:audit
 ```
 
-## CI coverage
+## CI and governance
 
-The GitHub Actions workflow in [`.github/workflows/ci.yml`](/Users/somu-cookunity/Documents/zip/.github/workflows/ci.yml) runs on every pull request and on pushes to `master`.
+The primary CI workflow is [`ci.yml`](.github/workflows/ci.yml). It runs on:
 
-Phase 2 quality gates also include:
+- every pull request
+- every push to `master`
 
-- TypeScript typechecking
-- Vitest coverage collection
-- npm dependency audit
-- CodeQL static analysis in [`.github/workflows/codeql.yml`](/Users/somu-cookunity/Documents/zip/.github/workflows/codeql.yml)
-- scheduled security audit in [`.github/workflows/security-audit.yml`](/Users/somu-cookunity/Documents/zip/.github/workflows/security-audit.yml)
+The CI pipeline is split into explicit jobs so the PR view shows clear quality stages:
 
-Phase 3 operational additions include:
+- `Lint`
+- `Typecheck`
+- `Unit Tests`
+- `API Integration Tests`
+- `Web Integration Tests`
+- `Coverage`
+- `E2E Smoke Tests`
+- `Quality Gate`
 
-- nightly regression in [`.github/workflows/nightly-regression.yml`](/Users/somu-cookunity/Documents/zip/.github/workflows/nightly-regression.yml)
-- deploy smoke validation in [`.github/workflows/deploy-smoke.yml`](/Users/somu-cookunity/Documents/zip/.github/workflows/deploy-smoke.yml)
-- secret scanning in [`.github/workflows/gitleaks.yml`](/Users/somu-cookunity/Documents/zip/.github/workflows/gitleaks.yml)
-- issue templates for bugs, flaky tests, and non-sensitive security findings
-- local blue/green deployment assets in [`docker-compose.blue-green.yml`](/Users/somu-cookunity/Documents/zip/docker-compose.blue-green.yml)
+Additional quality and security workflows include:
 
-## Branch governance
+- [`codeql.yml`](.github/workflows/codeql.yml)
+- [`security-audit.yml`](.github/workflows/security-audit.yml)
+- [`gitleaks.yml`](.github/workflows/gitleaks.yml)
+- [`nightly-regression.yml`](.github/workflows/nightly-regression.yml)
+- [`deploy-smoke.yml`](.github/workflows/deploy-smoke.yml)
+- [`release.yml`](.github/workflows/release.yml)
+- [`pr-governance.yml`](.github/workflows/pr-governance.yml)
 
-This repo includes the CI workflow, a PR template, and a `CODEOWNERS` file. After pushing to GitHub, configure branch protection on `master` to:
+Branch governance is designed around `master`:
 
-- require the CI check to pass
-- require 1 approval
-- dismiss stale approvals on new commits
-- block direct pushes
-- allow squash and rebase merges only
+- pull request required before merge
+- 1 approval required
+- stale approvals dismissed on new commits
+- force pushes blocked
+- deletions restricted
+- linear history required
+- squash and rebase merges allowed
+- merge commits disabled
 
 This sample repository uses `master` as the default branch to match the wording of the take-home assignment.
 
-Detailed rollout notes are in [`docs/process.md`](/Users/somu-cookunity/Documents/zip/docs/process.md).
+PR process artifacts:
+
+- [`CODEOWNERS`](CODEOWNERS)
+- [PR template](.github/pull_request_template.md)
+- [Issue templates](.github/ISSUE_TEMPLATE)
+
+Detailed rollout notes are in [docs/process.md](docs/process.md).
+
+## PR quality rules
+
+The PR template and governance workflow enforce a more deliberate review process:
+
+- branch name must follow a format such as `feature/change-name`
+- PR title must follow a format such as `QA-1234: concise summary`
+- PR body must include required sections for summary, validation, checklist, and risk review
+- ticket references are required in the PR content
 
 ## Render deployment
 
-This repo includes a [`render.yaml`](/Users/somu-cookunity/Documents/zip-code/render.yaml) blueprint for a single Render web service. The service builds the Vite frontend, serves it from the Express app, and exposes the API and UI from one URL.
+This repo includes a Render Blueprint in [`render.yaml`](render.yaml). The deployed service uses one Node web service:
 
-To deploy:
+- Vite builds the frontend
+- Express serves the built frontend
+- the same service exposes `/api/health` and the browser app
 
-1. In Render, click `New +` -> `Blueprint`.
-2. Connect the GitHub repo and select the `master` branch.
-3. Render will detect [`render.yaml`](/Users/somu-cookunity/Documents/zip-code/render.yaml) and create one Node web service.
-4. After the first deploy, use the service's `onrender.com` URL for the manual deploy smoke workflow in [`.github/workflows/deploy-smoke.yml`](/Users/somu-cookunity/Documents/zip-code/.github/workflows/deploy-smoke.yml).
+Deployment steps:
 
-The blueprint uses `autoDeployTrigger: checksPass`, so Render deploys only after GitHub checks pass on the linked branch.
+1. In Render, create a new `Blueprint`
+2. Connect the GitHub repository
+3. Point the Blueprint at `master`
+4. Render reads [`render.yaml`](render.yaml) and creates the service
+5. Render auto-deploys only after checks pass on the tracked branch
+
+Live service URL:
+
+- [zip-procurement-quality-gates.onrender.com](https://zip-procurement-quality-gates.onrender.com)
 
 ## Deployment and release pipeline
 
@@ -104,31 +167,67 @@ flowchart LR
 Stage details:
 
 1. `PR Validation`
-   Runs linting, typechecking, unit tests, integration tests, E2E smoke tests, coverage, and security checks.
+   Lint, typecheck, unit tests, API integration tests, web integration tests, coverage, E2E smoke, and PR governance checks run on the PR.
 2. `Approval Gate`
-   Requires one review approval and passing required checks before merge.
+   Branch protection requires approval and passing required checks.
 3. `Merge to master`
-   Uses squash or rebase only.
+   Approved PRs merge to the protected branch.
 4. `Render Deploy`
-   Render auto-deploys the merged commit from `master`.
+   Render deploys the merged commit from `master`.
 5. `Post-Deploy Validation`
-   Validates the live root URL, `/api/health`, and deployed Playwright smoke tests.
+   The live root URL, `/api/health`, and deployed smoke tests validate the running application.
 6. `Tag + GitHub Release`
-   Runs [`.github/workflows/release.yml`](/Users/somu-cookunity/Documents/zip-code/.github/workflows/release.yml) to create a semantic version tag such as `v1.0.0` and publish a GitHub Release.
+   The manual release workflow creates a semantic version tag and publishes a GitHub Release after validation passes.
 
 This keeps deployment automatic but release marking intentional.
 
-## Local blue/green rollout
+## Release metadata
 
-The repository includes a Docker-based blue/green demo for local release validation. Setup notes are in [`docs/blue-green.md`](/Users/somu-cookunity/Documents/zip/docs/blue-green.md).
+The deployed service reports lightweight release metadata from `/api/health`:
 
-The Gitleaks workflow is ready for personal repositories as-is. If you run this repo under a GitHub organization, add a `GITLEAKS_LICENSE` secret per the action's requirements.
+```json
+{
+  "status": "ok",
+  "version": "v1.0.0",
+  "commitSha": "<sha>"
+}
+```
 
-## Operating model
+This makes it easier to confirm what version is deployed during validation and release promotion.
 
-Operational governance and reporting assets are available in:
+## Local Docker and blue/green support
 
-- [`docs/ownership.md`](/Users/somu-cookunity/Documents/zip/docs/ownership.md)
-- [`docs/triage-and-comms.md`](/Users/somu-cookunity/Documents/zip/docs/triage-and-comms.md)
-- [`docs/weekly-quality-report.md`](/Users/somu-cookunity/Documents/zip/docs/weekly-quality-report.md)
-- [`docs/bug-scoring.md`](/Users/somu-cookunity/Documents/zip/docs/bug-scoring.md)
+The primary hosted deployment path for this take-home uses Render. Docker and blue/green assets are included as local release-engineering demonstrations:
+
+- [`docker-compose.blue-green.yml`](docker-compose.blue-green.yml)
+- [`docs/blue-green.md`](docs/blue-green.md)
+- [`scripts/switch-active-color.sh`](scripts/switch-active-color.sh)
+
+These assets model:
+
+- dual-color rollout preparation
+- health-based traffic switching
+- rollback thinking
+- future-state environment portability
+
+## Operating model and reporting
+
+Supporting process docs are available in:
+
+- [Architecture](docs/architecture.md)
+- [Process](docs/process.md)
+- [Ownership](docs/ownership.md)
+- [Triage and communications](docs/triage-and-comms.md)
+- [Weekly quality report](docs/weekly-quality-report.md)
+- [Bug scoring](docs/bug-scoring.md)
+- [Video outline](docs/video-outline.md)
+
+## Should there be Codex or skills docs?
+
+No additional Codex-specific or skills-specific documentation is needed for the take-home submission. Those are assistant tooling details, not part of the product, CI/CD, or QA process the reviewer is evaluating. The stronger submission is the one that stays focused on:
+
+- application behavior
+- test strategy
+- CI/CD controls
+- deployment and release process
+- stakeholder communication
