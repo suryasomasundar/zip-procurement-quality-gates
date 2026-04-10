@@ -129,13 +129,31 @@ The deploy-smoke workflow can be triggered manually with a target URL. It reuses
 
 ## Release process
 
-A simple release process for this repo is:
+This repo treats release as staged promotion rather than one long script.
 
-1. merge an approved PR into `master`
-2. allow Render to auto-deploy from `master`
-3. validate the live root URL and `/api/health`
-4. run [`.github/workflows/release.yml`](/Users/somu-cookunity/Documents/zip-code/.github/workflows/release.yml) from `master`
-5. the release workflow validates the live deployment again, runs deployed smoke tests, creates a version tag, and publishes a GitHub Release
+```mermaid
+flowchart LR
+  A["Stage 1: PR Validation"] --> B["Stage 2: Approval Gate"]
+  B --> C["Stage 3: Deploy from master"]
+  C --> D["Stage 4: Live Validation"]
+  D --> E["Stage 5: Release Tag + Notes"]
+  D --> F["Rollback or Fix Forward"]
+```
+
+Stage summary:
+
+1. `PR Validation`
+   Lint, typecheck, unit tests, integration tests, E2E smoke, coverage, and security checks run on the pull request.
+2. `Approval Gate`
+   Branch protection requires a reviewer approval and passing checks before merge.
+3. `Deploy from master`
+   Render automatically deploys the merged commit from `master`.
+4. `Live Validation`
+   The deployed root URL, `/api/health`, and deployed smoke tests are validated against the live service.
+5. `Release Tag + Notes`
+   [`.github/workflows/release.yml`](/Users/somu-cookunity/Documents/zip-code/.github/workflows/release.yml) creates a semantic version tag and a GitHub Release only after live validation passes.
+
+The `/api/health` endpoint includes release metadata so the deployed service can report its current version during validation.
 
 ## Blue/green mechanism
 
