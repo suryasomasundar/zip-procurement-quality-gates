@@ -1,5 +1,21 @@
 # Triage And Communication
 
+GitHub is the system of record for PR state, approvals, comments, and check results. Slack is the attention and escalation channel.
+
+## Review request template
+
+Use a dedicated PR channel such as `#team-prs` or `<team-name>-prs` when a pull request is ready for review.
+
+```text
+PR ready for review: QA-1234: concise summary
+PR: <link>
+Area: <frontend/api/domain/ci/release>
+Risk: <low/medium/high>
+Reviewers requested: <names>
+Checks: <running/green/failing>
+Target merge: <timeframe>
+```
+
 ## Triage workflow
 
 When a check fails:
