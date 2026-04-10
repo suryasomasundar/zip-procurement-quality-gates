@@ -10,7 +10,7 @@ This repository includes a local blue/green deployment model using Docker Compos
 - `web-green`
 - `edge`
 
-The `edge` proxy reads `ACTIVE_COLOR` from [`.env.blue-green`](/Users/somu-cookunity/Documents/zip/.env.blue-green) and routes traffic to either the blue or green stack.
+The `edge` proxy reads `ACTIVE_COLOR` from [`.env.blue-green`](../.env.blue-green) and routes traffic to either the blue or green stack.
 
 ## Start the environment
 

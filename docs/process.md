@@ -41,7 +41,7 @@ This satisfies the assignment requirement to require squash and rebase style mer
 
 ## CI behavior
 
-The workflow in [`ci.yml`](/Users/somu-cookunity/Documents/zip/.github/workflows/ci.yml) runs on:
+The workflow in [`ci.yml`](../.github/workflows/ci.yml) runs on:
 
 - every pull request
 - every push to `master`
@@ -103,10 +103,10 @@ As this process evolves, the key stakeholders are:
 
 Operational ownership, reporting, and communication templates are documented in:
 
-- [`ownership.md`](/Users/somu-cookunity/Documents/zip/docs/ownership.md)
-- [`triage-and-comms.md`](/Users/somu-cookunity/Documents/zip/docs/triage-and-comms.md)
-- [`weekly-quality-report.md`](/Users/somu-cookunity/Documents/zip/docs/weekly-quality-report.md)
-- [`bug-scoring.md`](/Users/somu-cookunity/Documents/zip/docs/bug-scoring.md)
+- [`ownership.md`](./ownership.md)
+- [`triage-and-comms.md`](./triage-and-comms.md)
+- [`weekly-quality-report.md`](./weekly-quality-report.md)
+- [`bug-scoring.md`](./bug-scoring.md)
 
 ## Phase 3 rollout maturity
 
@@ -151,13 +151,13 @@ Stage summary:
 4. `Live Validation`
    The deployed root URL, `/api/health`, and deployed smoke tests are validated against the live service.
 5. `Release Tag + Notes`
-   [`.github/workflows/release.yml`](/Users/somu-cookunity/Documents/zip-code/.github/workflows/release.yml) creates a semantic version tag and a GitHub Release only after live validation passes.
+   [`.github/workflows/release.yml`](../.github/workflows/release.yml) creates a semantic version tag and a GitHub Release only after live validation passes.
 
 The `/api/health` endpoint includes release metadata so the deployed service can report its current version during validation.
 
 ## Blue/green mechanism
 
-The blue/green assets in [`docker-compose.blue-green.yml`](/Users/somu-cookunity/Documents/zip/docker-compose.blue-green.yml) model a local release pattern where:
+The blue/green assets in [`docker-compose.blue-green.yml`](../docker-compose.blue-green.yml) model a local release pattern where:
 
 1. blue and green stacks exist at the same time
 2. an edge proxy points traffic to the active stack

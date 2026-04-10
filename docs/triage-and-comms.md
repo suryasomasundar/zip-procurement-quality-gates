@@ -6,7 +6,7 @@ When a check fails:
 
 1. Confirm which signal failed: lint, typecheck, unit, integration, E2E, coverage, audit, CodeQL, or secret scan.
 2. Determine scope: PR-only, `master` branch, nightly regression, or deployed environment.
-3. Assign the component owner from [`ownership.md`](/Users/somu-cookunity/Documents/zip/docs/ownership.md).
+3. Assign the component owner from [`ownership.md`](./ownership.md).
 4. Capture evidence: failing logs, artifacts, traces, screenshots, or SARIF/code scanning output.
 5. Decide disposition:
    - product defect
