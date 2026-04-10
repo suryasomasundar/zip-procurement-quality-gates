@@ -88,20 +88,31 @@ The blueprint uses `autoDeployTrigger: checksPass`, so Render deploys only after
 
 ## Deployment and release pipeline
 
-The deployment pipeline for this repo is:
+```mermaid
+flowchart LR
+  A["Pull Request"] --> B["Stage 1: PR Validation"]
+  B --> C["Stage 2: Approval Gate"]
+  C --> D["Stage 3: Merge to master"]
+  D --> E["Stage 4: Render Deploy"]
+  E --> F["Stage 5: Post-Deploy Validation"]
+  F --> G["Stage 6: Tag + GitHub Release"]
+  F --> H["Rollback or Fix Forward"]
+```
 
-1. Open a pull request against `master`.
-2. GitHub Actions runs linting, typechecking, tests, coverage, and security checks.
-3. After approval and passing checks, merge to `master`.
-4. Render auto-deploys the merged commit from `master`.
-5. Validate the live deployment with:
-   - the root URL
-   - `/api/health`
-6. Run the manual release workflow in [`.github/workflows/release.yml`](/Users/somu-cookunity/Documents/zip-code/.github/workflows/release.yml) to:
-   - re-validate the live deployment
-   - run deployed Playwright smoke tests
-   - create a Git tag such as `v1.0.0`
-   - publish a GitHub Release
+Stage details:
+
+1. `PR Validation`
+   Runs linting, typechecking, unit tests, integration tests, E2E smoke tests, coverage, and security checks.
+2. `Approval Gate`
+   Requires one review approval and passing required checks before merge.
+3. `Merge to master`
+   Uses squash or rebase only.
+4. `Render Deploy`
+   Render auto-deploys the merged commit from `master`.
+5. `Post-Deploy Validation`
+   Validates the live root URL, `/api/health`, and deployed Playwright smoke tests.
+6. `Tag + GitHub Release`
+   Runs [`.github/workflows/release.yml`](/Users/somu-cookunity/Documents/zip-code/.github/workflows/release.yml) to create a semantic version tag such as `v1.0.0` and publish a GitHub Release.
 
 This keeps deployment automatic but release marking intentional.
 

@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import type { ProcurementRequest } from "@zip-takehome/domain";
 
-import { evaluateProcurementRequest } from "./api";
+import { evaluateProcurementRequest, fetchDeploymentHealth } from "./api";
 
 const initialForm: ProcurementRequest = {
   title: "",
@@ -35,6 +35,27 @@ export default function App() {
   const [form, setForm] = useState<ProcurementRequest>(initialForm);
   const [errors, setErrors] = useState<Partial<Record<keyof ProcurementRequest, string>>>({});
   const [submission, setSubmission] = useState<SubmissionState>({ status: "idle" });
+  const [deploymentVersion, setDeploymentVersion] = useState<string>("loading");
+
+  useEffect(() => {
+    let cancelled = false;
+
+    fetchDeploymentHealth()
+      .then((health) => {
+        if (!cancelled) {
+          setDeploymentVersion(health.version);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setDeploymentVersion("unknown");
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -233,6 +254,10 @@ export default function App() {
           )}
         </aside>
       </section>
+      <footer className="release-footer">
+        <span>Release version: {deploymentVersion}</span>
+        <span>Pipeline stages: validate, deploy, verify, release.</span>
+      </footer>
     </main>
   );
 }

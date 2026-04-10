@@ -15,14 +15,28 @@ describe("Procurement Intake app", () => {
 
     vi.stubGlobal(
       "fetch",
-      vi.fn().mockResolvedValue({
-        json: async () => ({
-          isValid: false,
-          errors: {
-            title: "This field is required.",
-            amount: "Amount must be greater than zero."
-          }
-        })
+      vi.fn().mockImplementation(async (input: string | URL | Request) => {
+        const url = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
+
+        if (url.includes("/api/health")) {
+          return {
+            json: async () => ({
+              status: "ok",
+              version: "v1.0.0",
+              commitSha: "abc123"
+            })
+          };
+        }
+
+        return {
+          json: async () => ({
+            isValid: false,
+            errors: {
+              title: "This field is required.",
+              amount: "Amount must be greater than zero."
+            }
+          })
+        };
       })
     );
 
@@ -34,6 +48,7 @@ describe("Procurement Intake app", () => {
       await screen.findByText(/please fix the highlighted fields/i)
     ).toBeInTheDocument();
     expect(screen.getByText(/this field is required/i)).toBeInTheDocument();
+    expect(await screen.findByText(/release version: v1.0.0/i)).toBeInTheDocument();
   });
 
   it("renders the approval outcome for a valid request", async () => {
@@ -41,14 +56,28 @@ describe("Procurement Intake app", () => {
 
     vi.stubGlobal(
       "fetch",
-      vi.fn().mockResolvedValue({
-        json: async () => ({
-          isValid: true,
-          summary:
-            "Atlas Supply Co. requires Manager, Finance, Legal, Security approval with high risk.",
-          approvals: ["Manager", "Finance", "Legal", "Security"],
-          riskLevel: "high"
-        })
+      vi.fn().mockImplementation(async (input: string | URL | Request) => {
+        const url = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
+
+        if (url.includes("/api/health")) {
+          return {
+            json: async () => ({
+              status: "ok",
+              version: "v1.0.0",
+              commitSha: "abc123"
+            })
+          };
+        }
+
+        return {
+          json: async () => ({
+            isValid: true,
+            summary:
+              "Atlas Supply Co. requires Manager, Finance, Legal, Security approval with high risk.",
+            approvals: ["Manager", "Finance", "Legal", "Security"],
+            riskLevel: "high"
+          })
+        };
       })
     );
 
@@ -78,5 +107,6 @@ describe("Procurement Intake app", () => {
     expect(screen.getByText("Finance")).toBeInTheDocument();
     expect(screen.getByText("Legal")).toBeInTheDocument();
     expect(screen.getByText("Security")).toBeInTheDocument();
+    expect(await screen.findByText(/release version: v1.0.0/i)).toBeInTheDocument();
   });
 });

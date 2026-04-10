@@ -14,6 +14,13 @@ type AppOptions = {
 const currentFilePath = fileURLToPath(import.meta.url);
 const currentDirectory = path.dirname(currentFilePath);
 
+export function getReleaseMetadata() {
+  return {
+    version: process.env.RELEASE_VERSION ?? process.env.npm_package_version ?? "dev",
+    commitSha: process.env.RENDER_GIT_COMMIT ?? process.env.GITHUB_SHA ?? "local"
+  };
+}
+
 type ResolveWebDistDirectoryOptions = {
   candidateDirectories?: string[];
   existsSync?: typeof fs.existsSync;
@@ -51,7 +58,10 @@ export function createApp(options: AppOptions = {}) {
   app.use(express.json());
 
   app.get("/api/health", (_request, response) => {
-    response.json({ status: "ok" });
+    response.json({
+      status: "ok",
+      ...getReleaseMetadata()
+    });
   });
 
   app.post("/api/requests/evaluate", (request, response) => {

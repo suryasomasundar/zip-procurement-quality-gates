@@ -4,6 +4,12 @@ import type {
   ValidationResult
 } from "@zip-takehome/domain";
 
+export type HealthResponse = {
+  status: string;
+  version: string;
+  commitSha: string;
+};
+
 export async function evaluateProcurementRequest(
   request: ProcurementRequest
 ): Promise<ValidationResult & Partial<EvaluationResult>> {
@@ -16,4 +22,9 @@ export async function evaluateProcurementRequest(
   });
 
   return (await response.json()) as ValidationResult & Partial<EvaluationResult>;
+}
+
+export async function fetchDeploymentHealth(): Promise<HealthResponse> {
+  const response = await fetch("/api/health");
+  return (await response.json()) as HealthResponse;
 }
