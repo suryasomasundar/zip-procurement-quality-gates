@@ -11,6 +11,7 @@ export default defineConfig({
     exclude: ["tests/e2e/**"],
     coverage: {
       exclude: [
+        "dist/**",
         "playwright.config.ts",
         "vitest.integration.config.ts",
         "vite.config.ts",

@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: zip-procurement-quality-gates
+    runtime: node
+    plan: free
+    region: oregon
+    autoDeployTrigger: checksPass
+    previews:
+      generation: automatic
+    buildCommand: npm install && npm --workspace @zip-takehome/web run build
+    startCommand: npm --workspace @zip-takehome/api run start
+    healthCheckPath: /api/health
+    buildFilter:
+      paths:
+        - apps/**
+        - packages/**
+        - package.json
+        - package-lock.json
+        - tsconfig.base.json

@@ -73,6 +73,19 @@ This repo includes the CI workflow, a PR template, and a `CODEOWNERS` file. Afte
 
 Detailed rollout notes are in [`docs/process.md`](/Users/somu-cookunity/Documents/zip/docs/process.md).
 
+## Render deployment
+
+This repo includes a [`render.yaml`](/Users/somu-cookunity/Documents/zip-code/render.yaml) blueprint for a single Render web service. The service builds the Vite frontend, serves it from the Express app, and exposes the API and UI from one URL.
+
+To deploy:
+
+1. In Render, click `New +` -> `Blueprint`.
+2. Connect the GitHub repo and select the `master` branch.
+3. Render will detect [`render.yaml`](/Users/somu-cookunity/Documents/zip-code/render.yaml) and create one Node web service.
+4. After the first deploy, use the service's `onrender.com` URL for the manual deploy smoke workflow in [`.github/workflows/deploy-smoke.yml`](/Users/somu-cookunity/Documents/zip-code/.github/workflows/deploy-smoke.yml).
+
+The blueprint uses `autoDeployTrigger: checksPass`, so Render deploys only after GitHub checks pass on the linked branch.
+
 ## Local blue/green rollout
 
 The repository includes a Docker-based blue/green demo for local release validation. Setup notes are in [`docs/blue-green.md`](/Users/somu-cookunity/Documents/zip/docs/blue-green.md).
