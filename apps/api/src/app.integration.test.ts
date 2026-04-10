@@ -7,7 +7,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { sampleRequest } from "@zip-takehome/domain";
 
-import { app, createApp } from "./app";
+import { app, createApp, resolveDefaultWebDistDirectory } from "./app";
 
 describe("POST /api/requests/evaluate", () => {
   it("returns service health", async () => {
@@ -78,5 +78,25 @@ describe("frontend fallback hosting", () => {
     );
 
     expect(response.status).toBe(404);
+  });
+});
+
+describe("resolveDefaultWebDistDirectory", () => {
+  it("returns the first existing candidate directory", () => {
+    const selectedDirectory = resolveDefaultWebDistDirectory({
+      candidateDirectories: ["/missing", "/available"],
+      existsSync: (directoryPath) => directoryPath === "/available"
+    });
+
+    expect(selectedDirectory).toBe("/available");
+  });
+
+  it("falls back to the first candidate when none exist", () => {
+    const selectedDirectory = resolveDefaultWebDistDirectory({
+      candidateDirectories: ["/missing-one", "/missing-two"],
+      existsSync: () => false
+    });
+
+    expect(selectedDirectory).toBe("/missing-one");
   });
 });

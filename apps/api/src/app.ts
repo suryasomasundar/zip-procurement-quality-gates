@@ -13,7 +13,31 @@ type AppOptions = {
 
 const currentFilePath = fileURLToPath(import.meta.url);
 const currentDirectory = path.dirname(currentFilePath);
-const defaultWebDistDirectory = path.resolve(currentDirectory, "../../web/dist");
+
+type ResolveWebDistDirectoryOptions = {
+  candidateDirectories?: string[];
+  existsSync?: typeof fs.existsSync;
+};
+
+export function resolveDefaultWebDistDirectory(
+  options: ResolveWebDistDirectoryOptions = {}
+) {
+  const candidateDirectories = options.candidateDirectories ?? [
+    path.resolve(process.cwd(), "apps/web/dist"),
+    path.resolve(currentDirectory, "../../web/dist")
+  ];
+  const existsSync = options.existsSync ?? fs.existsSync;
+
+  for (const candidateDirectory of candidateDirectories) {
+    if (existsSync(candidateDirectory)) {
+      return candidateDirectory;
+    }
+  }
+
+  return candidateDirectories[0];
+}
+
+const defaultWebDistDirectory = resolveDefaultWebDistDirectory();
 
 export function createApp(options: AppOptions = {}) {
   const app = express();
@@ -42,6 +66,7 @@ export function createApp(options: AppOptions = {}) {
   });
 
   if (hasBuiltFrontend) {
+    console.log(`Serving built frontend from ${webDistDirectory}`);
     app.use(express.static(webDistDirectory));
 
     app.get("*", frontendFallbackLimiter, (request, response, next) => {
