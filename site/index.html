@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zip QA Delivery Overview</title>
+    <link rel="stylesheet" href="./styles.css">
+  </head>
+  <body>
+    <main class="page">
+      <section class="hero">
+        <p class="eyebrow">QA Automation Take-Home</p>
+        <h1>Zip Procurement Delivery System</h1>
+        <p class="lede">
+          A compact procurement workflow wrapped in deliberate review standards,
+          CI quality gates, security checks, deployment validation, and release controls.
+        </p>
+        <div class="hero-actions">
+          <a class="button button-primary" href="https://zip-procurement-quality-gates.onrender.com">Open Live App</a>
+          <a class="button" href="https://github.com/suryasomasundar/zip-procurement-quality-gates">View Repository</a>
+        </div>
+      </section>
+
+      <section class="grid two-up">
+        <article class="card">
+          <h2>What This Demonstrates</h2>
+          <ul>
+            <li>Layered automated testing across unit, integration, and end-to-end coverage</li>
+            <li>Protected pull request workflow with governance, approval, and merge controls</li>
+            <li>Security scanning with CodeQL, dependency audit, and secret scanning</li>
+            <li>Render deployment plus live validation and release tagging</li>
+          </ul>
+        </article>
+        <article class="card">
+          <h2>Operating Goal</h2>
+          <p>
+            Keep <code>master</code> releasable, make pull requests easy to review,
+            and ensure releases are validated before they are marked complete.
+          </p>
+          <p class="note">
+            The live demo runs on Render's free tier, so the first request after inactivity may take time while the service wakes up.
+          </p>
+        </article>
+      </section>
+
+      <section class="card">
+        <h2>Delivery Flow</h2>
+        <ol class="steps">
+          <li>Feature branch created from <code>master</code></li>
+          <li>PR governance, CI, and security checks run</li>
+          <li>Reviewer approval and conversation resolution gate the merge</li>
+          <li>Merge to <code>master</code> triggers deploy</li>
+          <li>Render deploys the application</li>
+          <li>Live validation checks the root URL and <code>/api/health</code></li>
+          <li>Release workflow creates the tag and GitHub Release</li>
+        </ol>
+      </section>
+
+      <section class="card">
+        <div class="section-heading">
+          <div>
+            <h2>Role-Based Review Guide</h2>
+            <p class="section-copy">
+              Select a role to see what that person is expected to look for, communicate, and own in the process.
+            </p>
+          </div>
+        </div>
+        <div class="role-picker" role="tablist" aria-label="Review roles">
+          <button class="role-tab is-active" type="button" role="tab" aria-selected="true" data-role="engineer">Engineer</button>
+          <button class="role-tab" type="button" role="tab" aria-selected="false" data-role="qa">QA / Quality</button>
+          <button class="role-tab" type="button" role="tab" aria-selected="false" data-role="manager">Engineering Manager</button>
+          <button class="role-tab" type="button" role="tab" aria-selected="false" data-role="platform">Platform / Infra</button>
+        </div>
+
+        <div class="role-panels">
+          <article class="role-panel is-active" data-panel="engineer">
+            <h3>Engineer</h3>
+            <ul>
+              <li>Open a reviewable PR with a valid ticketed title and completed template.</li>
+              <li>Run relevant local validation, explain risk honestly, and request the right reviewers.</li>
+              <li>Coordinate with QA for test failures and with platform when environment or workflow issues appear.</li>
+              <li>Rebase on latest <code>master</code> to resolve conflicts and rerun validation before merge.</li>
+            </ul>
+          </article>
+
+          <article class="role-panel" data-panel="qa">
+            <h3>QA / Quality</h3>
+            <ul>
+              <li>Review regression risk, missing coverage, flaky behavior, and end-user workflow impact.</li>
+              <li>Help distinguish product defects from test defects when failures occur.</li>
+              <li>Own the health of quality gates, nightly coverage, and release confidence.</li>
+              <li>Escalate broken <code>master</code>, noisy tests, or recurring validation gaps.</li>
+            </ul>
+          </article>
+
+          <article class="role-panel" data-panel="manager">
+            <h3>Engineering Manager</h3>
+            <ul>
+              <li>Enforce review SLA, merge discipline, and ownership expectations.</li>
+              <li>Step in when reviews stall, merge blockers are unclear, or exceptions are requested.</li>
+              <li>Decide whether a failure blocks delivery or can be mitigated temporarily with follow-up.</li>
+              <li>Track quality signals such as broken-gate recovery time and review latency.</li>
+            </ul>
+          </article>
+
+          <article class="role-panel" data-panel="platform">
+            <h3>Platform / Infra</h3>
+            <ul>
+              <li>Review workflow, deployment, secret-handling, and release-process changes.</li>
+              <li>Own CI/CD plumbing, Render reliability, and release automation correctness.</li>
+              <li>Help triage environment failures, startup issues, or deployment drift.</li>
+              <li>Guide future improvements such as preview environments, alerts, and rollback automation.</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="section-heading">
+          <div>
+            <h2>Interactive Process Explorer</h2>
+            <p class="section-copy">
+              Use the tabs below to explore the controls, review expectations, failure modes, communication patterns, and future-state improvements.
+            </p>
+          </div>
+        </div>
+
+        <div class="explorer-tabs" role="tablist" aria-label="Process explorer">
+          <button class="explorer-tab is-active" type="button" role="tab" aria-selected="true" data-explorer="controls">Controls</button>
+          <button class="explorer-tab" type="button" role="tab" aria-selected="false" data-explorer="readiness">PR Readiness</button>
+          <button class="explorer-tab" type="button" role="tab" aria-selected="false" data-explorer="failure">Failure Modes</button>
+          <button class="explorer-tab" type="button" role="tab" aria-selected="false" data-explorer="notifications">Notifications</button>
+          <button class="explorer-tab" type="button" role="tab" aria-selected="false" data-explorer="future">Future State</button>
+        </div>
+
+        <div class="explorer-panels">
+          <article class="explorer-panel is-active" data-explorer-panel="controls">
+            <div class="grid two-up compact-grid">
+              <article class="inner-card">
+                <h3>PR Controls</h3>
+                <table>
+                  <tbody>
+                    <tr>
+                      <th>Branch format</th>
+                      <td><code>feature/&lt;change&gt;</code>, <code>fix/&lt;change&gt;</code>, etc.</td>
+                    </tr>
+                    <tr>
+                      <th>PR title</th>
+                      <td><code>QA-1234: concise summary</code></td>
+                    </tr>
+                    <tr>
+                      <th>Approval</th>
+                      <td>1 required reviewer</td>
+                    </tr>
+                    <tr>
+                      <th>Merge policy</th>
+                      <td>Squash or rebase only</td>
+                    </tr>
+                    <tr>
+                      <th>Required gate</th>
+                      <td><code>CI / Quality Gate (pull_request)</code></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </article>
+              <article class="inner-card">
+                <h3>GitHub Settings: Now vs Nice To Have</h3>
+                <table>
+                  <tbody>
+                    <tr>
+                      <th>Now</th>
+                      <td>PR required, approval required, conversations resolved, force pushes blocked, linear history, squash/rebase only</td>
+                    </tr>
+                    <tr>
+                      <th>Next</th>
+                      <td>Code Owner review enforcement, branch freshness before merge, GitHub Environments, secret scanning push protection</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </article>
+            </div>
+          </article>
+
+          <article class="explorer-panel" data-explorer-panel="readiness">
+            <div class="grid two-up compact-grid">
+              <article class="inner-card">
+                <h3>PR Readiness Checklist</h3>
+                <div class="check-grid">
+                  <div class="check-item">Ticket reference included</div>
+                  <div class="check-item">Scope and risk explained clearly</div>
+                  <div class="check-item">Validation listed honestly</div>
+                  <div class="check-item">Correct reviewers requested</div>
+                  <div class="check-item">UI evidence attached when relevant</div>
+                  <div class="check-item">Docs updated for workflow or release changes</div>
+                </div>
+              </article>
+              <article class="inner-card">
+                <h3>Review SLA And Communication</h3>
+                <table>
+                  <tbody>
+                    <tr>
+                      <th>Standard PR</th>
+                      <td>First review response within 4 business hours</td>
+                    </tr>
+                    <tr>
+                      <th>Urgent PR</th>
+                      <td>Acknowledged within 1 business hour</td>
+                    </tr>
+                    <tr>
+                      <th>Escalation</th>
+                      <td>Escalate after 1 business day without review</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div class="message-example">
+                  <p><strong>PR ready for review:</strong> QA-1234: concise summary</p>
+                  <p><strong>Area:</strong> CI / governance</p>
+                  <p><strong>Risk:</strong> Low</p>
+                  <p><strong>Reviewers requested:</strong> @qa-owner @platform-owner</p>
+                  <p><strong>Checks:</strong> Running</p>
+                </div>
+              </article>
+            </div>
+          </article>
+
+          <article class="explorer-panel" data-explorer-panel="failure">
+            <div class="grid two-up compact-grid">
+              <article class="inner-card">
+                <h3>Where This Can Fail</h3>
+                <details class="detail-block" open>
+                  <summary>Governance and review</summary>
+                  <ul>
+                    <li>Bad branch names or incomplete PR metadata</li>
+                    <li>Review SLA misses or unclear ownership</li>
+                    <li>Required check names drifting from branch protection</li>
+                  </ul>
+                </details>
+                <details class="detail-block">
+                  <summary>CI and security</summary>
+                  <ul>
+                    <li>Lint, type, test, or coverage regressions</li>
+                    <li>Dependency vulnerabilities or CodeQL findings</li>
+                    <li>Secret leakage detected by Gitleaks</li>
+                  </ul>
+                </details>
+                <details class="detail-block">
+                  <summary>Deployment and release</summary>
+                  <ul>
+                    <li>Render build, startup, or asset-serving failures</li>
+                    <li>Broken <code>/api/health</code> or deployed smoke failures</li>
+                    <li>Tagging, version, or release-validation mismatches</li>
+                  </ul>
+                </details>
+              </article>
+              <article class="inner-card">
+                <h3>Practical Response Patterns</h3>
+                <table>
+                  <tbody>
+                    <tr>
+                      <th>False positives</th>
+                      <td>Triage into real issue, accepted risk, or false positive and document the result</td>
+                    </tr>
+                    <tr>
+                      <th>Flaky tests</th>
+                      <td>Retry once, track the offender, and create follow-up work instead of normalizing reruns</td>
+                    </tr>
+                    <tr>
+                      <th>Env mismatch</th>
+                      <td>Validate live root URL and <code>/api/health</code> before release</td>
+                    </tr>
+                    <tr>
+                      <th>Review bottleneck</th>
+                      <td>Escalate after SLA breach and rebalance reviewers</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </article>
+            </div>
+          </article>
+
+          <article class="explorer-panel" data-explorer-panel="notifications">
+            <div class="grid two-up compact-grid">
+              <article class="inner-card">
+                <h3>Current Notification Model</h3>
+                <ul>
+                  <li>GitHub is the source of truth for checks, comments, approvals, and failures</li>
+                  <li>Slack should be the attention channel for ready-for-review and urgent failures</li>
+                  <li>Broken <code>master</code> and failed releases should escalate immediately</li>
+                </ul>
+              </article>
+              <article class="inner-card">
+                <h3>Who Needs To Be Involved</h3>
+                <ul>
+                  <li>Engineers for code and PR ownership</li>
+                  <li>QA for regression strategy and quality gates</li>
+                  <li>Managers for SLA, merge discipline, and escalation</li>
+                  <li>Platform and security as deployment and risk controls grow</li>
+                </ul>
+              </article>
+            </div>
+          </article>
+
+          <article class="explorer-panel" data-explorer-panel="future">
+            <div class="grid two-up compact-grid">
+              <article class="inner-card">
+                <h3>AI In The Process</h3>
+                <p>
+                  AI-assisted review is advisory only. It is useful for early signals such as missing tests,
+                  workflow drift, and suspicious release changes, but human reviewers remain responsible for approval and merge judgment.
+                </p>
+              </article>
+              <article class="inner-card">
+                <h3>Future Enhancements</h3>
+                <ul>
+                  <li>Preview environments for richer PR validation</li>
+                  <li>Slack alerts for broken <code>master</code> and release failures</li>
+                  <li>Automatic reviewer routing by file ownership</li>
+                  <li>Flaky-test tracking and quarantine workflow</li>
+                </ul>
+              </article>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="footer-links">
+        <a href="https://github.com/suryasomasundar/zip-procurement-quality-gates/blob/master/docs/take-home-summary.md">Summary Doc</a>
+        <a href="https://github.com/suryasomasundar/zip-procurement-quality-gates/blob/master/docs/process.md">Process Doc</a>
+        <a href="https://github.com/suryasomasundar/zip-procurement-quality-gates/blob/master/docs/review-guidelines.md">Review Guidelines</a>
+        <a href="https://github.com/suryasomasundar/zip-procurement-quality-gates/blob/master/docs/qa-delivery-process-overview.html">Submission Doc</a>
+      </section>
+    </main>
+    <script>
+      function wireTabs(tabSelector, panelSelector, dataKey) {
+        const tabs = document.querySelectorAll(tabSelector);
+        const panels = document.querySelectorAll(panelSelector);
+
+        tabs.forEach((tab) => {
+          tab.addEventListener("click", () => {
+            const value = tab.dataset[dataKey];
+
+            tabs.forEach((item) => {
+              const isActive = item === tab;
+              item.classList.toggle("is-active", isActive);
+              item.setAttribute("aria-selected", String(isActive));
+            });
+
+            panels.forEach((panel) => {
+              panel.classList.toggle("is-active", panel.dataset[`${dataKey}Panel`] === value);
+            });
+          });
+        });
+      }
+
+      wireTabs(".role-tab", ".role-panel", "role");
+      wireTabs(".explorer-tab", ".explorer-panel", "explorer");
+    </script>
+  </body>
+</html>

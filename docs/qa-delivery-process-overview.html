@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>QA Delivery Process Overview</title>
+  <style>
+    body {
+      font-family: "Aptos", "Helvetica Neue", Arial, sans-serif;
+      color: #1f2937;
+      margin: 36px;
+      line-height: 1.45;
+    }
+    h1, h2, h3 {
+      color: #111827;
+      margin-bottom: 8px;
+    }
+    h1 {
+      font-size: 26px;
+      border-bottom: 2px solid #d1d5db;
+      padding-bottom: 10px;
+    }
+    h2 {
+      font-size: 18px;
+      margin-top: 24px;
+    }
+    h3 {
+      font-size: 14px;
+      margin-top: 18px;
+    }
+    p {
+      margin: 8px 0 12px 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 10px 0 18px 0;
+      font-size: 12px;
+    }
+    th, td {
+      border: 1px solid #d1d5db;
+      padding: 8px 10px;
+      vertical-align: top;
+      text-align: left;
+    }
+    th {
+      background: #f3f4f6;
+      font-weight: 700;
+    }
+    ul {
+      margin: 8px 0 12px 20px;
+    }
+    .meta {
+      color: #4b5563;
+      font-size: 12px;
+      margin-bottom: 18px;
+    }
+    .callout {
+      border-left: 4px solid #2563eb;
+      background: #eff6ff;
+      padding: 10px 12px;
+      margin: 14px 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>QA Delivery Process Overview</h1>
+  <p class="meta">
+    Zip QA Take-Home Summary<br>
+    Repository: https://github.com/suryasomasundar/zip-procurement-quality-gates<br>
+    Live application: https://zip-procurement-quality-gates.onrender.com
+  </p>
+
+  <h2>1. Purpose And Scope</h2>
+  <p>
+    This exercise is intentionally small at the product layer and more deliberate at the delivery layer.
+    The goal is to demonstrate how a procurement workflow can be implemented with clear review standards,
+    automated validation, protected merges, deployment confidence, and a lightweight release process.
+  </p>
+  <div class="callout">
+    The operating goal is simple: keep <strong>master</strong> releasable, make pull requests reviewable,
+    and ensure releases are validated before they are marked complete.
+  </div>
+
+  <h2>2. End-To-End Process</h2>
+  <table>
+    <tr>
+      <th>Stage</th>
+      <th>What Happens</th>
+      <th>Owner</th>
+    </tr>
+    <tr>
+      <td>1. Feature branch</td>
+      <td>An engineer creates a branch from <code>master</code> using an approved naming format such as <code>feature/&lt;change&gt;</code>.</td>
+      <td>Author</td>
+    </tr>
+    <tr>
+      <td>2. PR creation</td>
+      <td>The author opens a draft or ready-for-review PR with a ticketed title, completed template, validation notes, and risk summary.</td>
+      <td>Author</td>
+    </tr>
+    <tr>
+      <td>3. Governance and CI</td>
+      <td>GitHub Actions runs PR governance, CI quality checks, and security scans.</td>
+      <td>Automation</td>
+    </tr>
+    <tr>
+      <td>4. Review</td>
+      <td>Reviewers assess correctness, regression risk, test coverage, and deployment or workflow impact.</td>
+      <td>Reviewers</td>
+    </tr>
+    <tr>
+      <td>5. Merge gate</td>
+      <td>The PR may merge only after required approval, passing required checks, and resolved conversations.</td>
+      <td>Author + reviewer</td>
+    </tr>
+    <tr>
+      <td>6. Deploy</td>
+      <td>Merge to <code>master</code> triggers the same core validation and then Render deploys the application.</td>
+      <td>Automation</td>
+    </tr>
+    <tr>
+      <td>7. Live validation</td>
+      <td>The live URL, <code>/api/health</code>, and deployed smoke tests validate the running service.</td>
+      <td>Automation + QA</td>
+    </tr>
+    <tr>
+      <td>8. Release</td>
+      <td>A manual release workflow validates production and creates a version tag and GitHub Release.</td>
+      <td>Release owner</td>
+    </tr>
+  </table>
+
+  <h2>3. Review Process And Working Agreement</h2>
+  <h3>Ready For Review Standard</h3>
+  <table>
+    <tr>
+      <th>Check</th>
+      <th>Expectation</th>
+    </tr>
+    <tr>
+      <td>Branch naming</td>
+      <td>Must follow approved pattern such as <code>feature/&lt;change&gt;</code>, <code>fix/&lt;change&gt;</code>, or <code>docs/&lt;change&gt;</code>.</td>
+    </tr>
+    <tr>
+      <td>PR title</td>
+      <td>Must follow a ticketed format such as <code>QA-1234: concise summary</code>.</td>
+    </tr>
+    <tr>
+      <td>PR body</td>
+      <td>Must include change summary, validation, checklist, and risk review sections.</td>
+    </tr>
+    <tr>
+      <td>Validation</td>
+      <td>The author should run the relevant local checks and provide clear validation notes.</td>
+    </tr>
+    <tr>
+      <td>Review routing</td>
+      <td>The author should request reviewers intentionally based on the affected files and change type.</td>
+    </tr>
+    <tr>
+      <td>Artifacts</td>
+      <td>UI changes should include screenshots or other evidence where useful.</td>
+    </tr>
+  </table>
+
+  <h3>Communication Model</h3>
+  <ul>
+    <li>GitHub is the system of record for comments, approvals, checks, and merge blockers.</li>
+    <li>A dedicated Slack channel such as <code>#team-prs</code> should be used as the review attention channel.</li>
+    <li>When a PR is ready, the author should post the PR link, risk level, requested reviewers, and expected merge timing.</li>
+    <li>Urgent, release-blocking, or production-impacting PRs should also be called out in the main engineering channel.</li>
+  </ul>
+
+  <h3>Review SLA</h3>
+  <table>
+    <tr>
+      <th>Scenario</th>
+      <th>Expectation</th>
+    </tr>
+    <tr>
+      <td>Standard PR</td>
+      <td>First review response within 4 business hours</td>
+    </tr>
+    <tr>
+      <td>Urgent or release-blocking PR</td>
+      <td>Acknowledged within 1 business hour</td>
+    </tr>
+    <tr>
+      <td>Author response to blocking comments</td>
+      <td>Same business day when practical</td>
+    </tr>
+    <tr>
+      <td>Review delay beyond SLA</td>
+      <td>Escalate to lead or engineering manager</td>
+    </tr>
+  </table>
+
+  <h2>4. Controls And Protections</h2>
+  <table>
+    <tr>
+      <th>Control</th>
+      <th>Current implementation</th>
+    </tr>
+    <tr>
+      <td>PR gating</td>
+      <td>Pull request required before merge</td>
+    </tr>
+    <tr>
+      <td>Approval</td>
+      <td>At least 1 approval required</td>
+    </tr>
+    <tr>
+      <td>Conversation resolution</td>
+      <td>Required before merge</td>
+    </tr>
+    <tr>
+      <td>Status checks</td>
+      <td>Quality Gate plus governance and security checks</td>
+    </tr>
+    <tr>
+      <td>Merge policy</td>
+      <td>Squash and rebase enabled, merge commits disabled</td>
+    </tr>
+    <tr>
+      <td>History protection</td>
+      <td>Linear history required, force pushes blocked, deletions restricted</td>
+    </tr>
+    <tr>
+      <td>Ownership</td>
+      <td>CODEOWNERS plus documented reviewer routing</td>
+    </tr>
+    <tr>
+      <td>Release control</td>
+      <td>Production validation before tag and GitHub Release creation</td>
+    </tr>
+  </table>
+
+  <h2>5. Ways The Process Can Fail</h2>
+  <table>
+    <tr>
+      <th>Category</th>
+      <th>Typical failure modes</th>
+    </tr>
+    <tr>
+      <td>Governance</td>
+      <td>Invalid branch name, missing PR sections, missing ticket reference, stale reviewer ownership</td>
+    </tr>
+    <tr>
+      <td>CI</td>
+      <td>Lint failures, type drift, broken unit tests, failed API or UI integration tests, missing coverage</td>
+    </tr>
+    <tr>
+      <td>Security</td>
+      <td>Dependency vulnerabilities, CodeQL findings, accidental secret commits</td>
+    </tr>
+    <tr>
+      <td>Deployment</td>
+      <td>Render build/startup failures, frontend asset path issues, health endpoint mismatch</td>
+    </tr>
+    <tr>
+      <td>Release</td>
+      <td>Invalid tag format, failed deployed smoke tests, version drift between code and live service</td>
+    </tr>
+    <tr>
+      <td>Process</td>
+      <td>Required check names drift from branch protection, review SLA slips, ownership is unclear during incidents</td>
+    </tr>
+  </table>
+
+  <h2>6. Notifications And Where They Go</h2>
+  <table>
+    <tr>
+      <th>Signal</th>
+      <th>Current channel</th>
+      <th>Recommended next step</th>
+    </tr>
+    <tr>
+      <td>PR check failures</td>
+      <td>GitHub PR and GitHub Actions</td>
+      <td>Slack post in team PR channel</td>
+    </tr>
+    <tr>
+      <td>Review requests</td>
+      <td>GitHub notifications</td>
+      <td>Slack ready-for-review message</td>
+    </tr>
+    <tr>
+      <td>Security findings</td>
+      <td>GitHub Security and workflow logs</td>
+      <td>Slack escalation for high-severity findings</td>
+    </tr>
+    <tr>
+      <td>Broken master</td>
+      <td>GitHub Actions</td>
+      <td>Engineering Slack alert and merge pause</td>
+    </tr>
+    <tr>
+      <td>Release validation failure</td>
+      <td>GitHub Actions</td>
+      <td>Release-specific Slack escalation</td>
+    </tr>
+  </table>
+
+  <h2>7. Stakeholders As The Process Evolves</h2>
+  <table>
+    <tr>
+      <th>Stakeholder</th>
+      <th>Why they matter</th>
+    </tr>
+    <tr>
+      <td>Engineers</td>
+      <td>Implement changes, respond to CI failures, and review code</td>
+    </tr>
+    <tr>
+      <td>QA / quality engineering</td>
+      <td>Own test strategy, quality gates, flaky-test policy, and release confidence</td>
+    </tr>
+    <tr>
+      <td>Engineering managers</td>
+      <td>Own review expectations, merge policy, and SLA enforcement</td>
+    </tr>
+    <tr>
+      <td>Platform / infrastructure</td>
+      <td>Own CI/CD plumbing, deployment reliability, secrets, and workflow correctness</td>
+    </tr>
+    <tr>
+      <td>Security</td>
+      <td>Advise on vulnerabilities, secret exposure, and risky workflow changes</td>
+    </tr>
+    <tr>
+      <td>Product / business stakeholders</td>
+      <td>Validate that procurement routing and approval behavior still reflect business expectations</td>
+    </tr>
+  </table>
+
+  <h2>8. AI-Assisted Review</h2>
+  <p>
+    AI-assisted review is included as an optional advisory signal, not as a merge authority.
+    It can help surface missing tests, workflow drift, release-risk changes, and suspicious configuration changes,
+    but human reviewers remain responsible for correctness, approval, and release judgment.
+  </p>
+  <ul>
+    <li>Use AI review as an early warning signal.</li>
+    <li>Confirm actionable findings with a human reviewer.</li>
+    <li>Fix or explicitly address confirmed findings in the PR conversation.</li>
+  </ul>
+
+  <h2>9. Future Enhancements</h2>
+  <ul>
+    <li>Add preview environments for PR validation.</li>
+    <li>Add Slack notifications for broken <code>master</code> and release failures.</li>
+    <li>Add automatic reviewer routing by changed file path.</li>
+    <li>Add flaky-test quarantine and reliability tracking.</li>
+    <li>Add contract testing for API payload and behavior changes.</li>
+    <li>Add stricter release approvals for infrastructure and security-sensitive changes.</li>
+  </ul>
+</body>
+</html>
