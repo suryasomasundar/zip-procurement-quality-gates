@@ -52,6 +52,26 @@ flowchart LR
 | Conversation resolution | required |
 | Required status gate | `CI / Quality Gate (pull_request)` |
 
+## GitHub settings: now vs nice to have
+
+| Setting | Now | Nice to have later |
+| --- | --- | --- |
+| Pull request before merge | Required | Keep as-is |
+| Required approvals | 1 approval | Increase for higher-risk areas if team size grows |
+| Conversation resolution | Required | Keep as-is |
+| Required status checks | Quality gate plus governance and security checks | Add deployment-success checks when preview environments exist |
+| Merge methods | Squash and rebase only | Keep as-is |
+| Merge commits | Disabled | Keep as-is |
+| Force pushes | Blocked on `master` | Keep as-is |
+| Branch deletion | Restricted | Keep as-is |
+| Linear history | Required | Keep as-is |
+| CODEOWNERS | Present | Enforce Code Owner review for sensitive paths |
+| Branch freshness | Not required today | Require branches to be up to date before merge |
+| Direct pushes to `master` | Protected by PR flow | Further restrict bypass rights to a minimal admin set |
+| GitHub Environments | Not used as a merge gate today | Add staging/production environments with approval rules |
+| Secret scanning push protection | Not part of the current setup | Enable push protection to block leaked secrets before push |
+| Dependency update automation | Not part of the current setup | Add Dependabot or similar update workflows |
+
 ## CI and security checks
 
 | Workflow | Purpose |
@@ -89,6 +109,18 @@ Use this as the final “ready for review” standard.
 | Deployment | Render build failure, startup failure, broken frontend serving |
 | Release | invalid tag, live smoke failure, health endpoint mismatch |
 | Process | stale branch protection, slow review response, unclear ownership |
+
+## Practical response patterns
+
+| Failure mode | What happens | Practical response | Stronger long-term control |
+| --- | --- | --- | --- |
+| False positives | Teams see warnings that are not actionable and start ignoring them | Triage each finding into real issue, accepted risk, or false positive and document the disposition | Maintain suppression rules, severity thresholds, and a clear scan owner |
+| Flaky tests | The same PR passes on rerun without code changes | Retry once automatically, file a follow-up, and track the flaky test instead of silently ignoring it | Flaky-test dashboard, quarantine workflow, and test-suite ownership |
+| Environment mismatch after merge | PR checks pass, but the deployed app fails due to env or runtime differences | Validate the live root URL and `/api/health` before marking the release | Preview environments, config validation, and stronger runtime parity |
+| Review SLA bottleneck | One reviewer or one team becomes the critical path for many PRs | Escalate after SLA breach and rebalance reviewers using the Slack PR channel | Review load balancing, auto-routing, and SLA reporting |
+| Security scans are present but not operationalized | Findings accumulate and no one knows what is urgent | Assign a triage owner, apply severity labels, and require a disposition for each finding | SonarQube or similar can help broaden visibility, but ownership and remediation policy matter more than the tool alone |
+| Protected `master`, but weak release process | Code merges safely, but tags or release notes do not match what is live | Validate the live app and health metadata before creating the release | Deployment metadata, release approvals, and artifact-to-release version verification |
+| Merge conflict resolution introduces unreviewed risk | The resolved branch differs materially from what was originally approved | Rebase on latest `master`, rerun validation, and re-request review when risky files changed | Policy that workflow, deployment, and domain-logic conflicts require explicit re-review |
 
 ## Notifications and communication
 

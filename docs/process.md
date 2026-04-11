@@ -156,6 +156,18 @@ This process can fail in several ways.
 - flaky tests erode trust in the quality gates
 - ownership is unclear during an incident
 
+### Practical remediation patterns
+
+| Failure mode | Enterprise impact | Practical response | Long-term control |
+| --- | --- | --- | --- |
+| False positives in scans or review automation | Teams stop trusting warnings and start ignoring real issues | Require every finding to be triaged as real issue, accepted risk, or false positive | Suppression rules, severity thresholds, and a named owner for scan triage |
+| Flaky tests | Red builds lose meaning and real regressions get hidden inside noise | Retry once, track repeat offenders, and file explicit follow-up instead of silently rerunning forever | Flaky-test quarantine, reliability metrics, and suite ownership |
+| Environment mismatch after merge | PR checks pass but the deployed system fails because runtime assumptions differ | Validate the live root URL, `/api/health`, and deployed smoke flow before release | Preview environments, config validation, and stronger runtime parity |
+| Review SLA bottleneck | Delivery slows because one reviewer or team becomes the critical path | Escalate in the PR channel and rebalance review ownership after SLA breach | Review load balancing, reviewer auto-routing, and latency reporting |
+| Security scans without operational ownership | Findings accumulate, and serious issues blend into background noise | Assign a triage owner, define severity, and require explicit disposition for each finding | SonarQube or similar can expand visibility, but ownership, SLA, and remediation policy are the real controls |
+| Protected `master` but weak release process | Release notes, tags, and deployed code drift apart, making incidents harder to manage | Validate the live service before tagging and publishing a release | Release approvals, deployment metadata, and version-to-artifact verification |
+| Merge conflict resolution introduces unreviewed risk | The final merged code differs from what reviewers actually approved | Rebase on latest `master`, rerun validation, and request re-review when risky files changed | Require explicit re-review for workflow, deployment, and domain-logic conflict resolution |
+
 ## Notifications and visibility
 
 ### Current notification model
