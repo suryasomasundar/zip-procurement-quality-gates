@@ -6,7 +6,7 @@ on:
       - master
     paths:
       - site/**
-      - docs/QA-Delivery-Process-Overview.docx
+      - docs/qa-delivery-process-overview.html
       - docs/take-home-summary.md
       - docs/process.md
       - docs/review-guidelines.md
